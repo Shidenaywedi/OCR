@@ -1,41 +1,46 @@
 from flask import Flask, jsonify, request
-import os
+import pytesseract
+from PIL import Image
+import io
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
 
-# Ensure that the "uploads" folder exists (it’s where you will store uploaded files)
-if not os.path.exists('uploads'):
-    os.makedirs('uploads')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif'}
 
-# Home route
+def allowed_file(filename):
+    """Check if the file has a valid image extension."""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @app.route("/", methods=["GET"])
 def home():
-    return jsonify(message="Hello from Flask API!")
+    return jsonify(message="Hello from Flask OCR API! 😊")
 
-# Example route to handle OCR requests
 @app.route("/ocr", methods=["POST"])
 def ocr():
-    # Assuming the image is sent in the POST request
+    """Handles image upload and OCR processing with Tigrinya language support."""
     if 'image' not in request.files:
-        return jsonify(error="No image provided"), 400
-    
+        return jsonify(error="No image file provided"), 400
+
     image_file = request.files['image']
-    
-    # Here you can process the image (e.g., perform OCR) – this is just a placeholder
-    # You can replace it with actual OCR processing logic
-    image_filename = image_file.filename
-    image_file.save(os.path.join('uploads', image_filename))  # Save the uploaded file
 
-    return jsonify(message=f"Image {image_filename} received and processed.")
+    if image_file.filename == '':
+        return jsonify(error="No selected file"), 400
 
-# Example route to fetch some OCR results (mock)
-@app.route("/result", methods=["GET"])
-def result():
-    # This would typically fetch results from OCR processing
-    return jsonify(result="Sample OCR text from image")
+    if not allowed_file(image_file.filename):
+        return jsonify(error="Invalid file type. Allowed types: png, jpg, jpeg, tiff, bmp, gif"), 400
+
+    try:
+        # Read image directly from memory
+        image = Image.open(io.BytesIO(image_file.read()))
+
+        # Perform OCR using Tesseract with Tigrinya language
+        extracted_text = pytesseract.image_to_string(image, lang="tir")
+
+        return jsonify(text=extracted_text.strip())  # Return extracted text
+    except Exception as e:
+        return jsonify(error=f"An error occurred: {str(e)}"), 500
 
 if __name__ == "__main__":
-    # Vercel requires the app to run on host 0.0.0.0 and port 8080
     app.run(host="0.0.0.0", port=8080)
