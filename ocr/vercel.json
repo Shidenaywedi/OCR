@@ -1,4 +1,7 @@
 {
+    "rewrites": [
+        { "source": "/(.*)", "destination": "/" }
+      ],
     "builds": [
       {
         "src": "ocr/api/index.py",
