@@ -1,8 +1,14 @@
 from flask import Flask, jsonify, request
 import os
 from flask_cors import CORS
+
 app = Flask(__name__)
 CORS(app)
+
+# Ensure that the "uploads" folder exists (it’s where you will store uploaded files)
+if not os.path.exists('uploads'):
+    os.makedirs('uploads')
+
 # Home route
 @app.route("/", methods=["GET"])
 def home():
@@ -32,4 +38,4 @@ def result():
 
 if __name__ == "__main__":
     # Vercel requires the app to run on host 0.0.0.0 and port 8080
-    app.run(host="0.0.0.0", port=8080,)
+    app.run(host="0.0.0.0", port=8080)
