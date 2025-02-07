@@ -1,1 +1,2 @@
-web: python ocr/api/index.py
+web: gunicorn ocr.api.index:app
+
