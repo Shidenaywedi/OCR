@@ -5,7 +5,11 @@ import io
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app, resources={r"/ocr": {"origins": "*"}})  # Allow requests from all origins
+
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif'}
 
