@@ -1,15 +1,14 @@
-from flask import Flask, jsonify, request
 import pytesseract
-from PIL import Image
+from flask import Flask, jsonify, request
 import io
-from flask_cors import CORS
-
-app = Flask(__name__)
+from PIL import Image
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app, resources={r"/ocr": {"origins": "*"}})  # Allow requests from all origins
 
+# Set the path to the tesseract binary if necessary (adjust path as needed)
+pytesseract.pytesseract.tesseract_cmd = r'/usr/bin/tesseract'  # Path to the tesseract executable in the container
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'tiff', 'bmp', 'gif'}
 
