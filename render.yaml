@@ -6,3 +6,5 @@ services:
     region: oregon  # Change based on your preferred region
     plan: free
     autoDeploy: true
+buildCommand: |
+  apt-get update && apt-get install -y tesseract-ocr
