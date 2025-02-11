@@ -11,16 +11,17 @@ RUN apt-get update && apt-get install -y \
     liblcms2-dev \
     libopenjp2-7-dev \
     tesseract-ocr-eng \
+    tesseract-ocr-tir \  # Install Tigrigna language pack
     && rm -rf /var/lib/apt/lists/*
 
-# Check the installation path of Tesseract
-RUN which tesseract  # This should print the location of tesseract
+# Verify Tesseract installation by checking its version
+RUN tesseract --version
 
 # Set the working directory inside the container
 WORKDIR /app
 
 # Copy the requirements file into the container
-COPY requirements.txt .
+COPY requirements.txt ./
 
 # Install Python dependencies from the requirements file
 RUN pip install --no-cache-dir -r requirements.txt
