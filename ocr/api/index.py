@@ -7,7 +7,9 @@ app = Flask(__name__)
 CORS(app, resources={r"/ocr": {"origins": "*"}})
 
 OCR_SPACE_API_KEY = "your_api_key_here"  # Replace with your real API key
-
+@app.route("/", methods=["GET"])
+def say_hello():
+    return jsonify(answer="hello")
 @app.route("/ocr", methods=["POST"])
 def ocr():
     """Handles image upload and OCR processing using OCR.Space API."""
