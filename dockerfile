@@ -1,36 +1,38 @@
-# Use a base Python image
-FROM python:3.8-slim
+# Use a lightweight Python image
+FROM python:3.9-slim  
 
-# Set environment variables to ensure non-interactive installation
-ENV DEBIAN_FRONTEND=noninteractive
+# Set environment variables to prevent interactive prompts and enable unbuffered logs
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1
 
-# Install system dependencies (Tesseract and other libraries)
-RUN apt-get update && apt-get install -y \
+# Install system dependencies (Tesseract OCR and required libraries)
+RUN apt-get update && apt-get install -y --no-install-recommends \
     tesseract-ocr \
     libjpeg-dev \
     liblcms2-dev \
     libopenjp2-7-dev \
     tesseract-ocr-eng \
-    tesseract-ocr-tir \  # Install Tigrigna language pack
-    && rm -rf /var/lib/apt/lists/*
+    tesseract-ocr-tir \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Verify Tesseract installation by checking its version
+# Verify Tesseract installation
 RUN tesseract --version
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the requirements file into the container
-COPY requirements.txt ./
+# Copy the requirements file first (to leverage Docker caching)
+COPY requirements.txt .
 
-# Install Python dependencies from the requirements file
-RUN pip install --no-cache-dir -r requirements.txt
+# Upgrade pip and install dependencies
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copy the entire application into the container
 COPY . .
 
-# Expose the port that the app will run on
+# Expose the port the app will run on
 EXPOSE 8080
 
-# Command to run the Flask app
-CMD ["python", "app.py"]
+# Use ENTRYPOINT for flexibility in production
+ENTRYPOINT ["python", "app.py"]

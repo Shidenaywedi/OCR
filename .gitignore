@@ -3,8 +3,8 @@
 *.pyo
 *.pyd
 __pycache__/
-venv
-
+env
+.env
 # C extensions
 *.so
 
