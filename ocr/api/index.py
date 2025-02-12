@@ -1,3 +1,4 @@
+import os
 import requests
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -6,10 +7,16 @@ import base64
 app = Flask(__name__)
 CORS(app, resources={r"/ocr": {"origins": "*"}})
 
-OCR_SPACE_API_KEY = "your_api_key_here"  # Replace with your real API key
+# Load API key from environment variable
+OCR_SPACE_API_KEY = os.getenv("OCR_SPACE_API_KEY")
+
+if not OCR_SPACE_API_KEY:
+    raise ValueError("Missing OCR_SPACE_API_KEY environment variable")
+
 @app.route("/", methods=["GET"])
 def say_hello():
     return jsonify(answer="hello")
+
 @app.route("/ocr", methods=["POST"])
 def ocr():
     """Handles image upload and OCR processing using OCR.Space API."""
